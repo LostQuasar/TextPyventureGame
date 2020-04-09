@@ -1,4 +1,4 @@
-import os, random, re, simplify
+import os, random, re, json
 floors=[]
 floordata=[]
 cleanedfloor=[]
@@ -15,9 +15,9 @@ def openroom(loc):
     roomfile=''
     for num in range(0,3):
         roomfile=roomfile+str(hex(loc[num])).replace("0x","")
-    room = open(roomfile+".flr",'r')
-    print(room.readlines()[0])
-    room.close()
+    with open(roomfile+'.json') as f:
+        data = json.load(f)
+        print(data['name'])
 
 commands={'move':moveplayer}
 

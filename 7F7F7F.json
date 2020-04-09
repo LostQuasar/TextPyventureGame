@@ -1,0 +1,12 @@
+{
+    "name": "Example",
+    "description": "Description of example room",
+    "directions": {
+        "up":true,
+        "down":true,
+        "north":true,
+        "east":true,
+        "south":true,
+        "west":true
+     }
+  }
