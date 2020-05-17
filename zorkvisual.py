@@ -6,25 +6,56 @@ nicefloors=[]
 coll=[]
 location=[0x7F,0x7F,0x7F]
 health=100
-errcodes={1:"Direction not found",2:"Something is blocking the way"}
+
+def grammaran(string):
+    vowels=["a","e","i","o","u"]
+    if vowels.count(string[0]):
+        return("n "+string)
+    else:
+        return(" "+string)
+
 def moveplayer():
     try:
-        errorcode=0
-        global location
+        #if the direction is longer than 1 word, merge
         if len(commandinput)>2:
             movementdir=commandinput[1]+"_"+commandinput[2]
         else:
             movementdir=commandinput[1]
+        #the value from the json
         movementvalue=openroom(location,"direction")[movementdir]
         if movementvalue==True:
-            print("Moving "+movementdir.replace("_"," "))
+            print("Moving "+movementdir.replace("_"," ")+".")
+            #TODO: actually update room and read title & description
         elif movementvalue==False:
-            errorcode=2
+            print("Something is blocking the way.")
         else:
             print(movementvalue)
     except KeyError:
-        errorcode=1        
-    return errorcode
+        print("Direction not found.")     
+
+def inspect():
+    if commandinput[1]=="at":
+        commandinput.remove(commandinput[1])
+    try:
+        print(openroom(location,"inspect")[commandinput[1]])
+    except KeyError:
+        print("You can't seem to find a"+grammaran(commandinput[1])+".")
+
+def opencontainer():
+    itemlist=""
+    couter=1
+    try:
+        if commandinput[1]=="the":
+            commandinput.remove(commandinput[1])
+        for item in openroom(location,"container")[commandinput[1]]:
+            if len(openroom(location,"container")[commandinput[1]])==couter:
+                itemlist+="a"+grammaran(item)
+            else: 
+                itemlist+="a"+grammaran(item)+", and "
+            couter+=1
+        print("Inside the "+commandinput[1]+" you find "+itemlist+".")
+    except KeyError:
+        print("You can't seem to find a"+grammaran(commandinput[1])+".")
 
 def openroom(loc, var):
     roomfile=''
@@ -35,7 +66,8 @@ def openroom(loc, var):
         return roomdata[var]
 def quitgame():
     sys.exit("Quiting...")
-commands={'move':moveplayer,'go':moveplayer,"quit":quitgame,"exit":quitgame}
+
+commands={'move':moveplayer,'go':moveplayer,"quit":quitgame,"exit":quitgame,"inspect":inspect,"look":inspect,"open":opencontainer}
 
 if __name__ == '__main__':
     print(openroom(location, "name"))
@@ -44,7 +76,8 @@ if __name__ == '__main__':
             commandinput=input('>>> ').casefold().split(' ')
         except KeyboardInterrupt:
            quitgame()
-        commandaction=commands[commandinput[0].lower()]
-        error=commandaction()
-        if error!=0:
-            print(errcodes[error])
+        try:
+            commandaction=commands[commandinput[0].lower()]
+            commandaction()
+        except KeyError:
+            print("Command not recoginized.")

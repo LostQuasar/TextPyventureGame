@@ -1,6 +1,13 @@
 {
     "name": "Example",
     "description": "Description of example room",
+    "inspect": {
+        "room":"You look around the room and see a suitcase",
+        "suitcase":"It's an old worn suitcase"
+    },
+    "container": {
+        "suitcase":["sword","book"]
+    },
     "direction": {
         "up":false,
         "down":false,
