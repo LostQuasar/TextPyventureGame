@@ -9,16 +9,16 @@
     },
     "containers": {
         "suitcase":{
-            "items":{
-                "7893-4257":{"Name":"rusty sword","Type":"weapon","Damage":25,"Durability":10},
-                "7452-2321":{"Name":"book","Type":"misc"}
-                },
+            "items":[
+                    {"UUID":"7893-4257","name":"rusty sword","Type":"weapon","Damage":25,"Durability":10},
+                    {"UUID":"7452-2321", "name":"book","Type":"misc"}
+            ],
             "KeyItem":"8474-9235"
         },
         "bottle":{
-            "items":{
-                "8474-9235":{"Name":"golden key"}
-            }
+            "items":[
+                {"UUID":"8474-9235","name":"golden key"}
+            ]
         }
     },
     "direction": {
