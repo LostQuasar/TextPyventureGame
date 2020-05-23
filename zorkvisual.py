@@ -3,10 +3,10 @@ import random
 import re
 import json
 import sys
+import pickle
 
-location = [0x7F,0x7F,0x7F]
-health = 100
-inventory = []
+inventorydata = []
+playerdata = {'health':100,'location':[0x7F,0x7F,0x7F]}
 
 def grammaran(string):
     #If the word starts with a vowel, a -> an
@@ -24,10 +24,10 @@ def moveplayer():
         else:
             movementdir=commandinput[1]
         #the value from the json
-        movementvalue=openroom(location,"direction")[movementdir]
+        movementvalue=openroom(playerdata['location'],"direction")[movementdir]
         if movementvalue==True:
             print("Moving "+movementdir.replace("_"," ")+".")
-            #TODO: actually update room and read title & description
+            #TODO: actually update player location and read title & description
         elif movementvalue==False:
             print("Something is blocking the way.")
         else:
@@ -39,7 +39,7 @@ def inspect():
     if commandinput[1]=="at":
         commandinput.remove(commandinput[1])
     try:
-        print(openroom(location,"inspect")[commandinput[1]])
+        print(openroom(playerdata['location'],"inspect")[commandinput[1]])
     except KeyError:
         print("You can't seem to find a"+grammaran(commandinput[1])+".")
 
@@ -49,11 +49,11 @@ def opencontainer():
     try:
         if commandinput[1]=="the":
             commandinput.remove(commandinput[1])
-        if len(openroom(location,"container")[commandinput[1]]) == 0:
+        if len(openroom(playerdata['location'],"container")[commandinput[1]]) == 0:
             itemlist+="nothing"
         else:
-            for item in openroom(location,"container")[commandinput[1]]:
-                if len(openroom(location,"container")[commandinput[1]])==couter:
+            for item in openroom(playerdata['location'],"container")[commandinput[1]]:
+                if len(openroom(playerdata['location'],"container")[commandinput[1]])==couter:
                     itemlist+="a"+grammaran(item)
                 else: 
                     itemlist+="a"+grammaran(item)+", and "
@@ -71,6 +71,8 @@ def openroom(loc, var):
         return roomdata[var]
 
 def quitgame():
+    pickle.dump(playerdata,open('playerdata.pickle','wb'))
+    pickle.dump(inventorydata,open('inventorydata.pickle','wb'))
     sys.exit("Quiting...")
 
 #def getitem():
@@ -80,15 +82,24 @@ def quitgame():
 commands={'move':moveplayer,'go':moveplayer,"quit":quitgame,"exit":quitgame,"inspect":inspect,"look":inspect,"open":opencontainer}
 
 if __name__ == '__main__':
-    with open('player.sav','w+') as save:
-        print(openroom(location, "name"))
-        while True:
-            try:
-                commandinput=input('>>> ').casefold().split(' ')
-            except KeyboardInterrupt:
-                quitgame()
-            try:
-                commandaction = commands[commandinput[0].lower()]
-                commandaction()
-            except KeyError:
-                print("Command not recoginized.")
+
+    try:
+        playerdata = pickle.load(open('playerdata.pickle','rb'))
+    except FileNotFoundError:
+        pass
+    try:
+        inventorydata = pickle.load(open('inventorydata.pickle','rb'))
+    except FileNotFoundError:
+        pass
+
+    print(openroom(playerdata['location'], "name"))
+    while True:
+        try:
+            commandinput=input('>>> ').casefold().split(' ')
+        except KeyboardInterrupt:
+            quitgame()
+        try:
+            commandaction = commands[commandinput[0].lower()]
+            commandaction()
+        except KeyError:
+            print("Command not recoginized.")
