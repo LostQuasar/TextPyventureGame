@@ -2,11 +2,11 @@
     "name": "Example",
     "description": "Description of example room",
     "inspect": {
-        "room":"You look around the room and see a suitcase",
-        "suitcase":"It's an old worn suitcase"
+        "room":"indepth description of room",
+        "container":"indepth description of container"
     },
-    "container": {
-        "suitcase":["sword","book"]
+    "containers": {
+        "container":["list","of","container","items"]
     },
     "direction": {
         "up":false,

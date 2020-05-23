@@ -1,13 +1,15 @@
-import os, random, re, json, sys
-floors=[]
-floordata=[]
-cleanedfloor=[]
-nicefloors=[]
-coll=[]
-location=[0x7F,0x7F,0x7F]
-health=100
+import os
+import random
+import re
+import json
+import sys
+
+location = [0x7F,0x7F,0x7F]
+health = 100
+inventory = []
 
 def grammaran(string):
+    #If the word starts with a vowel, a -> an
     vowels=["a","e","i","o","u"]
     if vowels.count(string[0]):
         return("n "+string)
@@ -47,12 +49,15 @@ def opencontainer():
     try:
         if commandinput[1]=="the":
             commandinput.remove(commandinput[1])
-        for item in openroom(location,"container")[commandinput[1]]:
-            if len(openroom(location,"container")[commandinput[1]])==couter:
-                itemlist+="a"+grammaran(item)
-            else: 
-                itemlist+="a"+grammaran(item)+", and "
-            couter+=1
+        if len(openroom(location,"container")[commandinput[1]]) == 0:
+            itemlist+="nothing"
+        else:
+            for item in openroom(location,"container")[commandinput[1]]:
+                if len(openroom(location,"container")[commandinput[1]])==couter:
+                    itemlist+="a"+grammaran(item)
+                else: 
+                    itemlist+="a"+grammaran(item)+", and "
+                couter+=1
         print("Inside the "+commandinput[1]+" you find "+itemlist+".")
     except KeyError:
         print("You can't seem to find a"+grammaran(commandinput[1])+".")
@@ -61,23 +66,29 @@ def openroom(loc, var):
     roomfile=''
     for num in range(0,3):
         roomfile=roomfile+str(hex(loc[num])[2:])
-    with open(roomfile+'.json') as f:
+    with open(roomfile+'.json','r') as f:
         roomdata = json.load(f)
         return roomdata[var]
+
 def quitgame():
     sys.exit("Quiting...")
+
+#def getitem():
+
+
 
 commands={'move':moveplayer,'go':moveplayer,"quit":quitgame,"exit":quitgame,"inspect":inspect,"look":inspect,"open":opencontainer}
 
 if __name__ == '__main__':
-    print(openroom(location, "name"))
-    while True:
-        try:
-            commandinput=input('>>> ').casefold().split(' ')
-        except KeyboardInterrupt:
-           quitgame()
-        try:
-            commandaction=commands[commandinput[0].lower()]
-            commandaction()
-        except KeyError:
-            print("Command not recoginized.")
+    with open('player.sav','w+') as save:
+        print(openroom(location, "name"))
+        while True:
+            try:
+                commandinput=input('>>> ').casefold().split(' ')
+            except KeyboardInterrupt:
+                quitgame()
+            try:
+                commandaction = commands[commandinput[0].lower()]
+                commandaction()
+            except KeyError:
+                print("Command not recoginized.")
