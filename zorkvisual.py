@@ -6,6 +6,7 @@ import sys
 import pickle
 
 inventorydata = []
+# Location is a list of hex [North South, East West, Up Down]
 playerdata = {'health':100,'location':[0x7F,0x7F,0x7F]}
 
 def grammaran(string):
@@ -71,8 +72,8 @@ def openroom(loc, var):
         return roomdata[var]
 
 def quitgame():
-    pickle.dump(playerdata,open('playerdata.pickle','wb'))
-    pickle.dump(inventorydata,open('inventorydata.pickle','wb'))
+    pickle.dump(playerdata,open('playerdata.pkl','wb'))
+    pickle.dump(inventorydata,open('inventorydata.pkl','wb'))
     sys.exit("Quiting...")
 
 #def getitem():
@@ -80,15 +81,14 @@ def quitgame():
 commands={'move':moveplayer,'go':moveplayer,"quit":quitgame,"exit":quitgame,"inspect":inspect,"look":inspect,"open":opencontainer}
 
 if __name__ == '__main__':
-
     try:
-        playerdata = pickle.load(open('playerdata.pickle','rb'))
+        playerdata = pickle.load(open('playerdata.pkl','rb'))
     except FileNotFoundError:
-        pass
+        print("Player data not found")
     try:
-        inventorydata = pickle.load(open('inventorydata.pickle','rb'))
+        inventorydata = pickle.load(open('inventorydata.pkl','rb'))
     except FileNotFoundError:
-        pass
+        print("Inventory data not found")
 
     print(openroom(playerdata['location'], "name"))
     while True:

@@ -13,7 +13,6 @@
                 "7893-4257":{"Name":"rusty sword","Type":"weapon","Damage":25,"Durability":10},
                 "7452-2321":{"Name":"book","Type":"misc"}
                 },
-            "Locked":true,
             "KeyItem":"8474-9235"
         },
         "bottle":{
