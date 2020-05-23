@@ -77,8 +77,6 @@ def quitgame():
 
 #def getitem():
 
-
-
 commands={'move':moveplayer,'go':moveplayer,"quit":quitgame,"exit":quitgame,"inspect":inspect,"look":inspect,"open":opencontainer}
 
 if __name__ == '__main__':

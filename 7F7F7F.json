@@ -2,11 +2,25 @@
     "name": "Example",
     "description": "Description of example room",
     "inspect": {
-        "room":"indepth description of room",
-        "container":"indepth description of container"
+        "room":"you see a suitcase and a bottle",
+        "suitecase":"indepth description of suitcase",
+        "book":"yep this is a book",
+        "bottle":"you see something shiny in the bottle"
     },
     "containers": {
-        "container":["list","of","container","items"]
+        "suitcase":{
+            "items":{
+                "7893-4257":{"Name":"rusty sword","Type":"weapon","Damage":25,"Durability":10},
+                "7452-2321":{"Name":"book","Type":"misc"}
+                },
+            "Locked":true,
+            "KeyItem":"8474-9235"
+        },
+        "bottle":{
+            "items":{
+                "8474-9235":{"Name":"golden key"}
+            }
+        }
     },
     "direction": {
         "up":false,
@@ -20,4 +34,4 @@
         "south_east":false,
         "south_west":false
      }
-  }
+}
