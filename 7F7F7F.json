@@ -10,14 +10,14 @@
     "containers": {
         "suitcase":{
             "items":[
-                    {"UUID":"7893-4257","name":"rusty sword","Type":"weapon","Damage":25,"Durability":10},
+                    {"UUID":"7893-4257","name":"sword","Type":"weapon","Damage":25,"Durability":10},
                     {"UUID":"7452-2321", "name":"book","Type":"misc"}
             ],
             "KeyItem":"8474-9235"
         },
         "bottle":{
             "items":[
-                {"UUID":"8474-9235","name":"golden key"}
+                {"UUID":"8474-9235","name":"key"}
             ]
         }
     },
