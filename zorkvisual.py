@@ -39,7 +39,7 @@ def inspect():
     if commandinput[1]=='at':
         commandinput.remove(commandinput[1])
     try:
-        print(openRoom(playerData['location'],'inspect')[commandinput[1]])
+        print(openRoom(playerData['location'],'Inspect')[commandinput[1]])
     except KeyError:
         print('You can\'t seem to find a'+grammarAn(commandinput[1])+'.')
 
@@ -88,8 +88,8 @@ def openRoom(loc, var):
         return roomdata[var]
 
 def quitGame():
-    pickle.dump(playerdata,open('playerdata.pkl','wb'))
-    pickle.dump(inventorydata,open('inventorydata.pkl','wb'))
+    pickle.dump(playerData,open('playerData.pkl','wb'))
+    pickle.dump(inventoryData,open('inventoryData.pkl','wb'))
     sys.exit('Quiting...')
 
 def getItem():
@@ -111,11 +111,11 @@ commandslist = {'move':movePlayer, 'go':movePlayer, 'quit':quitGame,'exit':quitG
 
 if __name__ == '__main__':
     try:
-        playerdata = pickle.load(open('playerdata.pkl','rb'))
+        playerdata = pickle.load(open('playerData.pkl','rb'))
     except FileNotFoundError:
         print('Player data not found')
     try:
-        inventorydata = pickle.load(open('inventorydata.pkl','rb'))
+        inventorydata = pickle.load(open('inventoryData.pkl','rb'))
     except FileNotFoundError:
         print('Inventory data not found')
 
