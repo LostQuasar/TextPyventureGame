@@ -1,27 +1,30 @@
 {
-    "name": "Example",
-    "description": "Description of example room",
-    "inspect": {
+    "Name": "Example",
+    "Description": "Description of example room",
+    "Inspect": {
         "room":"you see a suitcase and a bottle",
         "suitecase":"indepth description of suitcase",
         "book":"yep this is a book",
         "bottle":"you see something shiny in the bottle"
     },
-    "containers": {
+    "Containers": {
         "suitcase":{
-            "items":[
-                    {"UUID":"7893-4257","name":"sword","Type":"weapon","Damage":25,"Durability":10},
-                    {"UUID":"7452-2321", "name":"book","Type":"misc"}
+            "Items":[
+                    {"UUID":"7893-4257","Name":"sword","Type":"weapon","Damage":25,"Durability":10},
+                    {"UUID":"7452-2321", "Name":"book","Type":"misc"}
             ],
-            "KeyItem":"8474-9235"
+            "Locked":{
+                "KeyItem":"8474-9235",
+                "LockMessage":"The suitcase seems to be locked."
+            }
         },
         "bottle":{
-            "items":[
-                {"UUID":"8474-9235","name":"key"}
+            "Items":[
+                {"UUID":"8474-9235","Name":"key"}
             ]
         }
     },
-    "direction": {
+    "Direction": {
         "up":false,
         "down":false,
         "north":false,
