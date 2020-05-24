@@ -111,11 +111,11 @@ commandslist = {'move':movePlayer, 'go':movePlayer, 'quit':quitGame,'exit':quitG
 
 if __name__ == '__main__':
     try:
-        playerdata = pickle.load(open('playerData.pkl','rb'))
+        playerData = pickle.load(open('playerData.pkl','rb'))
     except FileNotFoundError:
         print('Player data not found')
     try:
-        inventorydata = pickle.load(open('inventoryData.pkl','rb'))
+        inventoryData = pickle.load(open('inventoryData.pkl','rb'))
     except FileNotFoundError:
         print('Inventory data not found')
 
