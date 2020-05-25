@@ -32,7 +32,7 @@
         "south":false,
         "west":false,
         "north_east":false,
-        "north_west":false,
+        "north_west":true,
         "south_east":false,
         "south_west":false
      }

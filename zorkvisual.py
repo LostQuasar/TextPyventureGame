@@ -7,7 +7,8 @@ import pickle
 inventoryData = []
 # Location is a list of hex [North South, East West, Up Down]
 playerData = {'health':100,'location':[0x7F,0x7F,0x7F]}
-
+posDirections = {'north':[0x01,0x00,0x00], 'east':[0x00,0x01,0x00], 'up':[0x00,0x00,0x01]}
+negDirections = {'south':[0x01,0x00,0x00], 'west':[0x00,0x01,0x00], 'down':[0x00,0x00,0x01]}
 def grammarAn(string):
     #If the word starts with a vowel, a -> an
     vowels=['a','e','i','o','u']
@@ -17,31 +18,39 @@ def grammarAn(string):
         return(' '+string)
 
 def movePlayer():
+    #if the direction is longer than 1 word, merge
+    if len(commandInput)>2:
+        movementDirection = [commandInput[1], commandInput[2]]
+        movementIndex = commandInput[1] + '_' + commandInput[2]
+    else:
+        movementDirection = [commandInput[1]]
+        movementIndex = commandInput[1]
     try:
-        #if the direction is longer than 1 word, merge
-        if len(commandinput)>2:
-            movementdir=commandinput[1]+'_'+commandinput[2]
-        else:
-            movementdir=commandinput[1]
         #the value from the json
-        movementvalue=openRoom(playerdata['location'],'direction')[movementdir]
-        if movementvalue==True:
-            print('Moving '+movementdir.replace('_',' ')+'.')
-            #TODO: actually update player location and read title & description
-        elif movementvalue==False:
-            print('Something is blocking the way.')
-        else:
-            print(movementvalue)
+        movementValue = openRoom(playerData['location'],'Direction')[movementIndex]
     except KeyError:
-        print('Direction not found.')     
+        print('Direction not recongnized.')     
+    if movementValue == True:
+        print('Moving ' + movementIndex.replace('_',' ') + '.')
+        for direction in movementDirection:
+            if direction in posDirections:
+                for i in range(0,3):
+                    playerData['location'][i] += posDirections[direction][i]
+            if direction in negDirections:
+                for i in range(0,3):
+                    playerData['location'][i] -= negDirections[direction][i]
+        print(openRoom(playerData['location'],'Name') + '\n' + openRoom(playerData['location'],'Description'))
+        #TODO: actually update player location and read title & description
+    elif movementValue == False:
+        print('Something is blocking the way.')
 
 def inspect():
-    if commandinput[1]=='at':
-        commandinput.remove(commandinput[1])
+    if commandInput[1] == 'at':
+        commandInput.remove(commandInput[1])
     try:
-        print(openRoom(playerData['location'],'Inspect')[commandinput[1]])
+        print(openRoom(playerData['location'],'Inspect')[commandInput[1]])
     except KeyError:
-        print('You can\'t seem to find a'+grammarAn(commandinput[1])+'.')
+        print('You can\'t seem to find a'+grammarAn(commandInput[1])+'.')
 
 def isLocked(lockContainer):
     if 'Locked' in openRoom(playerData['location'],'Containers')[lockContainer]:
@@ -56,14 +65,14 @@ def isLocked(lockContainer):
 def openContainer():
     itemlist=''
     couter=1
-    if isLocked(commandinput[1]):
-        print(openRoom(playerData['location'],'Containers')[commandinput[1]]['Locked']['LockMessage'])
+    if isLocked(commandInput[1]):
+        print(openRoom(playerData['location'],'Containers')[commandInput[1]]['Locked']['LockMessage'])
     else:
         try:
-            if commandinput[1]=='the':
-                commandinput.remove(commandinput[1])
+            if commandInput[1]=='the':
+                commandInput.remove(commandInput[1])
             #put each item that is not in the players inventory into a list
-            validItems = [x for x in openRoom(playerData['location'],'Containers')[commandinput[1]]['Items'] if x not in inventoryData]
+            validItems = [x for x in openRoom(playerData['location'],'Containers')[commandInput[1]]['Items'] if x not in inventoryData]
             #If the list is empty
             if len(validItems) == 0:
                 itemlist+='nothing'
@@ -75,9 +84,9 @@ def openContainer():
                     else: 
                         itemlist+='a'+grammarAn(item['Name'])+', and '
                     couter+=1
-            print('Inside the '+commandinput[1]+' you find '+itemlist+'.')
+            print('Inside the '+commandInput[1]+' you find '+itemlist+'.')
         except KeyError:
-            print('You can\'t seem to find a'+grammarAn(commandinput[1])+'.')
+            print('You can\'t seem to find a'+grammarAn(commandInput[1])+'.')
 
 def openRoom(loc, var):
     roomfile=''
@@ -94,18 +103,18 @@ def quitGame():
 
 def getItem():
     #get item from container
-    if commandinput[2]=='from':
-        commandinput.remove(commandinput[2])
-    if isLocked(commandinput[2]):
-        print(openRoom(playerData['location'],'Containers')[commandinput[2]]['Locked']['LockMessage'])
+    if commandInput[2]=='from':
+        commandInput.remove(commandInput[2])
+    if isLocked(commandInput[2]):
+        print(openRoom(playerData['location'],'Containers')[commandInput[2]]['Locked']['LockMessage'])
     else:
         try:
-            inventoryData.append([x for x in openRoom(playerData['location'],'Containers')[commandinput[2]]['Items'] if x['Name'] == commandinput[1]][0])
-            print('You pick up the '+commandinput[1]+'.')
+            inventoryData.append([x for x in openRoom(playerData['location'],'Containers')[commandInput[2]]['Items'] if x['Name'] == commandInput[1]][0])
+            print('You pick up the '+commandInput[1]+'.')
         except KeyError:
-            print('You can\'t seem to find a'+grammarAn(commandinput[2])+'.')
+            print('You can\'t seem to find a'+grammarAn(commandInput[2])+'.')
         except IndexError:
-            print('You can\'t seem to find a'+grammarAn(commandinput[1]+' in the '+commandinput[2]+'.'))
+            print('You can\'t seem to find a'+grammarAn(commandInput[1]+' in the '+commandInput[2]+'.'))
 
 commandslist = {'move':movePlayer, 'go':movePlayer, 'quit':quitGame,'exit':quitGame, 'inspect':inspect, 'look':inspect, 'open':openContainer, 'get':getItem}
 
@@ -119,18 +128,18 @@ if __name__ == '__main__':
     except FileNotFoundError:
         print('Inventory data not found')
 
-    print(openRoom(playerData['location'], 'Name'))
+    print(openRoom(playerData['location'],'Name') + '\n' + openRoom(playerData['location'],'Description'))
 
     while True:
         try:
-            commandinput=input('>>> ').casefold().split(' ')
-            for item in commandinput:
+            commandInput=input('>>> ').casefold().split(' ')
+            for item in commandInput:
                 if item=="the":
-                    commandinput.remove(item)
+                    commandInput.remove(item)
         except KeyboardInterrupt:
              quitGame()
         try:
-            commandaction = commandslist[commandinput[0].lower()]
-            commandaction()
+            commandaction = commandslist[commandInput[0].lower()]
         except KeyError:
             print('Command not recoginized.')
+        commandaction()
