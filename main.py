@@ -4,6 +4,7 @@ import re
 import json
 import sys
 import pickle
+
 inventoryData = []
 # Location is a list of hex [North South, East West, Up Down]
 playerData = {'health':100,'location':[0x7F,0x7F,0x7F]}
@@ -66,10 +67,10 @@ def isLocked(lockContainer):
 def openContainer():
     itemlist=''
     couter=1
-    if isLocked(commandInput[1]):
-        print(openRoom(playerData['location'],'Containers')[commandInput[1]]['Locked']['LockMessage'])
-    else:
-        try:
+    try:
+        if isLocked(commandInput[1]):
+            print(openRoom(playerData['location'],'Containers')[commandInput[1]]['Locked']['LockMessage'])
+        else:
             if commandInput[1]=='the':
                 commandInput.remove(commandInput[1])
             #put each item that is not in the players inventory into a list
@@ -86,8 +87,8 @@ def openContainer():
                         itemlist+='a'+grammarAn(item['Name'])+', and '
                     couter+=1
             print('Inside the '+commandInput[1]+' you find '+itemlist+'.')
-        except KeyError:
-            print('You can\'t seem to find a'+grammarAn(commandInput[1])+'.')
+    except KeyError:
+        print('You can\'t seem to find a'+grammarAn(commandInput[1])+'.')
 
 def openRoom(loc, var):
     roomfile=''
