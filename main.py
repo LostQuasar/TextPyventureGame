@@ -42,7 +42,6 @@ def movePlayer():
                 for i in range(0,3):
                     playerData['location'][i] -= negDirections[direction][i]
         print(openRoom(playerData['location'],'Name') + '\n' + openRoom(playerData['location'],'Description'))
-        #TODO: actually update player location and read title & description
     elif movementValue == False:
         print('Something is blocking the way.')
     elif isLocked(movementIndex, 'Direction'):
