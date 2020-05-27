@@ -31,8 +31,8 @@ def movePlayer():
         #the value from the json
         movementValue = openRoom(playerData['location'],'Direction')[movementIndex]
     except KeyError:
-        print('Direction not recongnized.')     
-    if movementValue == True:
+        print('Direction not recongnized.')
+    if movementValue == True or (isLocked(movementIndex, 'Direction') == False):
         print('Moving ' + movementIndex.replace('_',' ') + '.')
         for direction in movementDirection:
             if direction in posDirections:
@@ -45,6 +45,8 @@ def movePlayer():
         #TODO: actually update player location and read title & description
     elif movementValue == False:
         print('Something is blocking the way.')
+    elif isLocked(movementIndex, 'Direction'):
+        print(openRoom(playerData['location'],'Direction')[movementIndex]['Locked']['LockMessage'])
 
 def inspect():
     if commandInput[1] == 'at':
@@ -54,9 +56,9 @@ def inspect():
     except KeyError:
         print('You can\'t seem to find a'+grammarAn(commandInput[1])+'.')
 
-def isLocked(lockContainer):
-    if 'Locked' in openRoom(playerData['location'],'Containers')[lockContainer]:
-        keyItem = [x for x in inventoryData if x['UUID'] == openRoom(playerData['location'],'Containers')[lockContainer]['Locked']['KeyItem']]
+def isLocked(lockObject, lockType):
+    if 'Locked' in openRoom(playerData['location'],lockType)[lockObject]:
+        keyItem = [x for x in inventoryData if x['UUID'] == openRoom(playerData['location'],lockType)[lockObject]['Locked']['KeyItem']]
         if keyItem:
             return False
         else:
@@ -68,7 +70,7 @@ def openContainer():
     itemlist=''
     couter=1
     try:
-        if isLocked(commandInput[1]):
+        if isLocked(commandInput[1], 'Containers'):
             print(openRoom(playerData['location'],'Containers')[commandInput[1]]['Locked']['LockMessage'])
         else:
             if commandInput[1]=='the':
@@ -94,9 +96,12 @@ def openRoom(loc, var):
     roomfile=''
     for num in range(0,3):
         roomfile=roomfile+str(hex(loc[num])[2:])
-    with open(roomfile+'.json','r') as f:
-        roomdata = json.load(f)
-        return roomdata[var]
+    try:
+        with open(roomfile+'.json','r') as f:
+            roomdata = json.load(f)
+            return roomdata[var]
+    except FileNotFoundError:
+        print('ERR: room file '+roomfile+'.json does not exist')
 
 def quitGame():
     pickle.dump(playerData,open('playerData.pkl','wb'))
@@ -107,7 +112,7 @@ def getItem():
     #get item from container
     if commandInput[2]=='from':
         commandInput.remove(commandInput[2])
-    if isLocked(commandInput[2]):
+    if isLocked(commandInput[2],'Containers'):
         print(openRoom(playerData['location'],'Containers')[commandInput[2]]['Locked']['LockMessage'])
     else:
         try:

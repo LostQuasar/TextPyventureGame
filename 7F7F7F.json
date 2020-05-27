@@ -30,7 +30,12 @@
         "north":false,
         "east":true,
         "south":false,
-        "west":false,
+        "west":{
+            "Locked":{
+                "KeyItem":"8474-9235",
+                "LockMessage":"The door seems to be locked."
+            }
+        },
         "north_east":false,
         "north_west":true,
         "south_east":false,
