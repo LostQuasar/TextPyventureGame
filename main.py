@@ -75,7 +75,7 @@ def openContainer():
             if commandInput[1]=='the':
                 commandInput.remove(commandInput[1])
             #put each item that is not in the players inventory into a list
-            validItems = [x for x in openRoom(playerData['location'],'Containers')[commandInput[1]]['Items'] if x not in inventoryData]
+            validItems = uuidCompare(openRoom(playerData['location'],'Containers')[commandInput[1]]['Items'], inventoryData)
             #If the list is empty
             if len(validItems) == 0:
                 itemlist+='nothing'
@@ -90,6 +90,35 @@ def openContainer():
             print('Inside the '+commandInput[1]+' you find '+itemlist+'.')
     except KeyError:
         print('You can\'t seem to find a'+grammarAn(commandInput[1])+'.')
+
+def getItem():
+    #get item from container
+    if commandInput[2]=='from':
+        commandInput.remove(commandInput[2])
+    if isLocked(commandInput[2],'Containers'):
+        print(openRoom(playerData['location'],'Containers')[commandInput[2]]['Locked']['LockMessage'])
+    try:
+        getItem = [x for x in openRoom(playerData['location'],'Containers')[commandInput[2]]['Items'] if x['Name'] == commandInput[1]]
+        if len(uuidCompare(getItem, inventoryData)) != 0:
+            inventoryData.append(getItem[0])
+            print('You pick up the '+commandInput[1]+'.')
+        else:
+            print('You already have the ' + commandInput[1] + '.')
+    except KeyError:
+        print('You can\'t seem to find a' + grammarAn(commandInput[2]) + '.')
+    except IndexError:
+        print('You can\'t seem to find a'+grammarAn(commandInput[1]+' in the '+commandInput[2]+'.'))
+
+def uuidCompare(list1, list2):
+    sameItems = []
+    validItems = list1
+    for item in list1:
+        for otherItem in list2:
+            if item['UUID'] == otherItem['UUID']:
+                sameItems.append(item)
+    for item in sameItems:
+        validItems.remove(item)
+    return validItems
 
 def openRoom(loc, var):
     roomfile=''
@@ -106,21 +135,6 @@ def quitGame():
     pickle.dump(playerData,open('playerData.pkl','wb'))
     pickle.dump(inventoryData,open('inventoryData.pkl','wb'))
     sys.exit('Quiting...')
-
-def getItem():
-    #get item from container
-    if commandInput[2]=='from':
-        commandInput.remove(commandInput[2])
-    if isLocked(commandInput[2],'Containers'):
-        print(openRoom(playerData['location'],'Containers')[commandInput[2]]['Locked']['LockMessage'])
-    else:
-        try:
-            inventoryData.append([x for x in openRoom(playerData['location'],'Containers')[commandInput[2]]['Items'] if x['Name'] == commandInput[1]][0])
-            print('You pick up the '+commandInput[1]+'.')
-        except KeyError:
-            print('You can\'t seem to find a'+grammarAn(commandInput[2])+'.')
-        except IndexError:
-            print('You can\'t seem to find a'+grammarAn(commandInput[1]+' in the '+commandInput[2]+'.'))
 
 commandslist = {'move':movePlayer, 'go':movePlayer, 'quit':quitGame,'exit':quitGame, 'inspect':inspect, 'look':inspect, 'open':openContainer, 'get':getItem}
 
