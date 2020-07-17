@@ -4,6 +4,7 @@ import re
 import json
 import sys
 import pickle
+import tkinter
 
 inventoryData = []
 # Location is a list of hex [North South, East West, Up Down]
@@ -31,9 +32,9 @@ def movePlayer():
         #the value from the json
         movementValue = openRoom(playerData['location'],'Direction')[movementIndex]
     except KeyError:
-        print('Direction not recongnized.')
+        updateText('Direction not recongnized.')
     if movementValue == True or (isLocked(movementIndex, 'Direction') == False):
-        print('Moving ' + movementIndex.replace('_',' ') + '.')
+        updateText('Moving ' + movementIndex.replace('_',' ') + '.')
         for direction in movementDirection:
             if direction in posDirections:
                 for i in range(0,3):
@@ -41,36 +42,39 @@ def movePlayer():
             if direction in negDirections:
                 for i in range(0,3):
                     playerData['location'][i] -= negDirections[direction][i]
-        print(openRoom(playerData['location'],'Name') + '\n' + openRoom(playerData['location'],'Description'))
+        updateText(openRoom(playerData['location'],'Name') + '\n' + openRoom(playerData['location'],'Description'))
     elif movementValue == False:
-        print('Something is blocking the way.')
+        updateText('Something is blocking the way.')
     elif isLocked(movementIndex, 'Direction'):
-        print(openRoom(playerData['location'],'Direction')[movementIndex]['Locked']['LockMessage'])
+        updateText(openRoom(playerData['location'],'Direction')[movementIndex]['Locked']['LockMessage'])
 
 def inspect():
     if commandInput[1] == 'at':
         commandInput.remove(commandInput[1])
     try:
-        print(openRoom(playerData['location'],'Inspect')[commandInput[1]])
+        updateText(openRoom(playerData['location'],'Inspect')[commandInput[1]])
     except KeyError:
-        print('You can\'t seem to find a'+grammarAn(commandInput[1])+'.')
+        updateText('You can\'t seem to find a'+grammarAn(commandInput[1])+'.')
 
 def isLocked(lockObject, lockType):
-    if 'Locked' in openRoom(playerData['location'],lockType)[lockObject]:
-        keyItem = [x for x in inventoryData if x['UUID'] == openRoom(playerData['location'],lockType)[lockObject]['Locked']['KeyItem']]
-        if keyItem:
-            return False
+    try:
+        if 'Locked' in openRoom(playerData['location'],lockType)[lockObject]:
+            hasKeyItem = [x for x in inventoryData if x['UUID'] == openRoom(playerData['location'],lockType)[lockObject]['Locked']['KeyItem']]
+            if hasKeyItem:
+                return False
+            else:
+                return True
         else:
-            return True
-    else:
-        return False
+            return False
+    except TypeError:
+        pass
 
 def openContainer():
     itemlist=''
     couter=1
     try:
         if isLocked(commandInput[1], 'Containers'):
-            print(openRoom(playerData['location'],'Containers')[commandInput[1]]['Locked']['LockMessage'])
+            updateText(openRoom(playerData['location'],'Containers')[commandInput[1]]['Locked']['LockMessage'])
         else:
             if commandInput[1]=='the':
                 commandInput.remove(commandInput[1])
@@ -87,27 +91,27 @@ def openContainer():
                     else: 
                         itemlist+='a'+grammarAn(item['Name'])+', and '
                     couter+=1
-            print('Inside the '+commandInput[1]+' you find '+itemlist+'.')
+            updateText('Inside the '+commandInput[1]+' you find '+itemlist+'.')
     except KeyError:
-        print('You can\'t seem to find a'+grammarAn(commandInput[1])+'.')
+        updateText('You can\'t seem to find a'+grammarAn(commandInput[1])+'.')
 
 def getItem():
     #get item from container
     if commandInput[2]=='from':
         commandInput.remove(commandInput[2])
     if isLocked(commandInput[2],'Containers'):
-        print(openRoom(playerData['location'],'Containers')[commandInput[2]]['Locked']['LockMessage'])
+        updateText(openRoom(playerData['location'],'Containers')[commandInput[2]]['Locked']['LockMessage'])
     try:
         getItem = [x for x in openRoom(playerData['location'],'Containers')[commandInput[2]]['Items'] if x['Name'] == commandInput[1]]
         if len(uuidCompare(getItem, inventoryData)) != 0:
             inventoryData.append(getItem[0])
-            print('You pick up the '+commandInput[1]+'.')
+            updateText('You pick up the '+commandInput[1]+'.')
         else:
-            print('You already have the ' + commandInput[1] + '.')
+            updateText('You already have the ' + commandInput[1] + '.')
     except KeyError:
-        print('You can\'t seem to find a' + grammarAn(commandInput[2]) + '.')
+        updateText('You can\'t seem to find a' + grammarAn(commandInput[2]) + '.')
     except IndexError:
-        print('You can\'t seem to find a'+grammarAn(commandInput[1]+' in the '+commandInput[2]+'.'))
+        updateText('You can\'t seem to find a'+grammarAn(commandInput[1]+' in the '+commandInput[2]+'.'))
 
 def uuidCompare(list1, list2):
     sameItems = []
@@ -129,16 +133,37 @@ def openRoom(loc, var):
             roomdata = json.load(f)
             return roomdata[var]
     except FileNotFoundError:
-        print('ERR: room file '+roomfile+'.json does not exist')
+        updateText('ERR: room file '+roomfile+'.json does not exist')
 
 def quitGame():
     pickle.dump(playerData,open('playerData.pkl','wb'))
     pickle.dump(inventoryData,open('inventoryData.pkl','wb'))
+    root.destroy()
     sys.exit('Quiting...')
 
 commandslist = {'move':movePlayer, 'go':movePlayer, 'quit':quitGame,'exit':quitGame, 'inspect':inspect, 'look':inspect, 'open':openContainer, 'get':getItem}
 
+def updateText(string):
+    output['text']=string
+
+def playerEntry(event):
+    global commandInput
+    commandInput=entry.get().casefold().split(' ')
+    entry.delete(0,len(entry.get()))
+    for item in commandInput:
+        if item=="the":
+            commandInput.remove(item)
+    try:
+        commandaction = commandslist[commandInput[0].lower()]
+    except KeyError:
+        updateText('Command not recognized')
+    try:
+        commandaction()
+    except UnboundLocalError:
+        pass
+
 if __name__ == '__main__':
+    commandInput=[]
     try:
         playerData = pickle.load(open('playerData.pkl','rb'))
     except FileNotFoundError:
@@ -147,19 +172,11 @@ if __name__ == '__main__':
         inventoryData = pickle.load(open('inventoryData.pkl','rb'))
     except FileNotFoundError:
         print('Inventory data not found')
-
-    print(openRoom(playerData['location'],'Name') + '\n' + openRoom(playerData['location'],'Description'))
-
-    while True:
-        try:
-            commandInput=input('>>> ').casefold().split(' ')
-            for item in commandInput:
-                if item=="the":
-                    commandInput.remove(item)
-        except KeyboardInterrupt:
-             quitGame()
-        try:
-            commandaction = commandslist[commandInput[0].lower()]
-        except KeyError:
-            print('Command not recoginized.')
-        commandaction()
+    
+    root = tkinter.Tk() 
+    entry = tkinter.Entry(root)
+    output = tkinter.Label(root,text=openRoom(playerData['location'],'Name') + '\n' + openRoom(playerData['location'],'Description'))
+    output.pack()
+    entry.pack()
+    root.bind('<Return>', playerEntry) 
+    root.mainloop() 

@@ -10,17 +10,17 @@
     "Containers": {
         "suitcase":{
             "Items":[
-                    {"UUID":"7893-4257","Name":"sword","Type":"weapon","Damage":25,"Durability":10},
-                    {"UUID":"7452-2321", "Name":"book","Type":"misc"}
+                    {"UUID":"96be18bb-b517-4043-9a63-fc9668fd223b","Name":"sword","Type":"weapon","Damage":25,"Durability":10},
+                    {"UUID":"27dfdf90-6e6a-4522-9015-3289afdd9ebe", "Name":"book","Type":"misc"}
             ],
             "Locked":{
-                "KeyItem":"8474-9235",
+                "KeyItem":"f239349a-a352-47da-a5cf-42387b44928f",
                 "LockMessage":"The suitcase seems to be locked."
             }
         },
         "bottle":{
             "Items":[
-                {"UUID":"8474-9235","Name":"key"}
+                {"UUID":"f239349a-a352-47da-a5cf-42387b44928f","Name":"key"}
             ]
         }
     },
@@ -32,7 +32,7 @@
         "south":false,
         "west":{
             "Locked":{
-                "KeyItem":"8474-9235",
+                "KeyItem":"f239349a-a352-47da-a5cf-42387b44928f",
                 "LockMessage":"The door seems to be locked."
             }
         },
